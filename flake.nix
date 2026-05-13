@@ -36,7 +36,7 @@
           rnvimserver = pkgs.stdenv.mkDerivation {
             pname = "rnvimserver";
             version = "0.99.4";
-            src = "${rnvimsrc}/rnvimserver";
+            src = rnvimsrc;
 
             nativeBuildInputs = [
               pkgs.gnumake
@@ -45,6 +45,7 @@
 
             buildPhase = ''
               runHook preBuild
+              cd rnvimserver
               make
               runHook postBuild
             '';
