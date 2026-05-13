@@ -8,7 +8,7 @@
   rnvimVersion = "v0.99.4";
 in
  {
-      url = "github:R-nvim/R.nvim?ref=${rnvimVersion}";
+      url = "github:R-nvim/R.nvim/$rnvimVersion";
       flake = false;
     };
   };
