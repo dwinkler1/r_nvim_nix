@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     rnvimsrc = {
-      url = "github:R-nvim/R.nvim/0.99.4";
+      url = "github:R-nvim/R.nvim/v0.99.4";
       flake = false;
     };
   };
