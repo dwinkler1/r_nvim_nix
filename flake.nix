@@ -4,11 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    rnvimsrc =let
-  rnvimVersion = "v0.99.4";
-in
- {
-      url = "github:R-nvim/R.nvim/$rnvimVersion";
+    rnvimsrc ={
+      url = "github:R-nvim/R.nvim/v0.99.4";
       flake = false;
     };
   };
