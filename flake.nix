@@ -45,8 +45,7 @@
 
             buildPhase = ''
               runHook preBuild
-              cd rnvimserver
-              make
+              make -C rnvimserver
               runHook postBuild
             '';
 
