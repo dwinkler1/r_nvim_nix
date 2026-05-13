@@ -4,13 +4,13 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    r.nvim-src = {
+    rnvimsrc = {
       url = "github:R-nvim/R.nvim";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, r.nvim-src }:
+  outputs = { self, nixpkgs, rnvimsrc }:
     let
       systems = [
         "x86_64-linux"
@@ -30,13 +30,13 @@
           nvimcom = pkgs.rPackages.buildRPackage {
             pname = "nvimcom";
             version = "0.99.4";
-            src = "${r.nvim-src}/nvimcom";
+            src = "${rnvimsrc}/nvimcom";
           };
 
           rnvimserver = pkgs.stdenv.mkDerivation {
             pname = "rnvimserver";
             version = "0.99.4";
-            src = "${r.nvim-src}/rnvimserver";
+            src = "${rnvimsrc}/rnvimserver";
 
             nativeBuildInputs = [
               pkgs.gnumake
@@ -59,7 +59,7 @@
           r-nvim = pkgs.vimUtils.buildVimPlugin {
             pname = "R.nvim";
             version = "0.99.4";
-            src = r.nvim-src;
+            src = rnvimsrc;
           };
 
           default = r-nvim;
