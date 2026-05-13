@@ -41,24 +41,35 @@
 
         nativeBuildInputs = [pkgs.gnumake pkgs.gcc];
 
+        preBuild = ''
+          cp -r rnvimserver rnvimserver-src
+          chmod -R +w rnvimserver-src
+        '';
+
         buildPhase = ''
           runHook preBuild
-          make -C rnvimserver
+          make -C rnvimserver-src
           runHook postBuild
         '';
 
         installPhase = ''
           runHook preInstall
-          install -Dm755 rnvimserver/rnvimserver $out/bin/rnvimserver
+          install -Dm755 rnvimserver-src/rnvimserver $out/bin/rnvimserver
           runHook postInstall
         '';
       };
 
-      r-nvim = pkgs.vimUtils.buildVimPlugin {
+      r-nvim = (pkgs.vimUtils.buildVimPlugin {
         pname = "R.nvim";
         version = rnvimVersion;
         src = rnvimsrc;
-      };
+      }).overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          mkdir -p $out/rnvimserver
+          cp ${rnvimserver}/bin/rnvimserver $out/rnvimserver/rnvimserver
+          chmod +x $out/rnvimserver/rnvimserver
+        '';
+      });
 
       default = r-nvim;
     });
