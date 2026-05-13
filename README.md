@@ -18,7 +18,7 @@ All built for `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, `aarch64-darwin`
 
 ```nix
 {
-  inputs.r-nvim.url = "github:<your-user>/r-nvim";
+  inputs.r-nvim.url = "github:dwinkle1/r_nvim_nix";
 
   outputs = { self, nixpkgs, r-nvim, ... }: {
     devShells.x86_64-linux.default =
