@@ -51,7 +51,7 @@
 
             installPhase = ''
               runHook preInstall
-              install -Dm755 rnvimserver $out/bin/rnvimserver
+              install -Dm755 rnvimserver/rnvimserver $out/bin/rnvimserver
               runHook postInstall
             '';
           };
