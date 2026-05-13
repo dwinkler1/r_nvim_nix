@@ -66,9 +66,9 @@
         });
 
       overlays.default = final: prev: {
-        nvimcom = self.packages.${final.system}.nvimcom;
-        rnvimserver = self.packages.${final.system}.rnvimserver;
-        r-nvim = self.packages.${final.system}.r-nvim;
+        nvimcom = self.packages.${final.stdenv.hostPlatform.system}.nvimcom;
+        rnvimserver = self.packages.${final.stdenv.hostPlatform.system}.rnvimserver;
+        r-nvim = self.packages.${final.stdenv.hostPlatform.system}.r-nvim;
       };
     };
 }
