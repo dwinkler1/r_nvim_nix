@@ -1,13 +1,13 @@
-let
-  rnvimVersion = "v0.99.4";
-in
 {
   description = "R.nvim packaging";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    rnvimsrc = {
+    rnvimsrc =let
+  rnvimVersion = "v0.99.4";
+in
+ {
       url = "github:R-nvim/R.nvim?ref=${rnvimVersion}";
       flake = false;
     };
@@ -26,18 +26,22 @@ in
     {
       packages = forAllSystems (system:
         let
+
+  rnvimVersion = "v0.99.4";
+
+
           pkgs = import nixpkgs { inherit system; };
         in
         rec {
           nvimcom = pkgs.rPackages.buildRPackage {
             pname = "nvimcom";
-            version = "0.99.4";
+            version = rnvimVersion;
             src = "${rnvimsrc}/nvimcom";
           };
 
           rnvimserver = pkgs.stdenv.mkDerivation {
             pname = "rnvimserver";
-            version = "0.99.4";
+            version = rnvimVersion;
             src = rnvimsrc;
 
             nativeBuildInputs = [ pkgs.gnumake pkgs.gcc ];
@@ -57,7 +61,7 @@ in
 
           r-nvim = pkgs.vimUtils.buildVimPlugin {
             pname = "R.nvim";
-            version = "0.99.4";
+            version = rnvimVersion;
             src = rnvimsrc;
           };
 
