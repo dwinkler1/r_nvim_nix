@@ -1,0 +1,70 @@
+name: Sync upstream R.nvim release
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Determine upstream and current versions
+        id: versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          upstream_tag="$(gh api repos/R-nvim/R.nvim/releases/latest --jq '.tag_name')"
+          current_tag="$(./scripts/get-rnvim-tag.sh flake.nix)"
+
+          echo "upstream_tag=$upstream_tag" >> "$GITHUB_OUTPUT"
+          echo "current_tag=$current_tag" >> "$GITHUB_OUTPUT"
+
+          if [ "$upstream_tag" = "$current_tag" ]; then
+            echo "update_needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "update_needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update flake and docs to latest upstream release
+        if: steps.versions.outputs.update_needed == 'true'
+        env:
+          NEW_TAG: ${{ steps.versions.outputs.upstream_tag }}
+        run: |
+          set -euo pipefail
+
+          tag_regex="$(./scripts/get-rnvim-tag.sh --tag-regex)"
+          sed -i -E "s|(url = \"github:R-nvim/R.nvim/)${tag_regex}|\1${NEW_TAG}|g" flake.nix
+          sed -i -E "s|(rnvimVersion = \")${tag_regex}(\";)|\1${NEW_TAG}\2|g" flake.nix
+          sed -i -E "s|(R.nvim\)\s+)${tag_regex}|\1${NEW_TAG}|g" README.md
+          sed -i -E "s|(-nvimcom-)${tag_regex}|\1${NEW_TAG}|g" README.md
+
+          nix flake lock --update-input rnvimsrc
+
+      - name: Create update pull request
+        if: steps.versions.outputs.update_needed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: update R.nvim to ${{ steps.versions.outputs.upstream_tag }}"
+          branch: "automation/update-rnvim-${{ steps.versions.outputs.upstream_tag }}"
+          delete-branch: true
+          title: "chore: update R.nvim to ${{ steps.versions.outputs.upstream_tag }}"
+          body: |
+            Updates this flake to upstream [R.nvim release `${{ steps.versions.outputs.upstream_tag }}`](https://github.com/R-nvim/R.nvim/releases/tag/${{ steps.versions.outputs.upstream_tag }}).
+
+            This automated update includes:
+            - `flake.nix` version references
+            - `flake.lock` update for `rnvimsrc`
+            - `README.md` version references

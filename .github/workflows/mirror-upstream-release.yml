@@ -1,0 +1,57 @@
+name: Mirror upstream release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - flake.nix
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mirror-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine release tag from flake
+        id: version
+        run: |
+          set -euo pipefail
+
+          tag="$(./scripts/get-rnvim-tag.sh flake.nix)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch upstream release metadata
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          release_json="$(gh api repos/R-nvim/R.nvim/releases/tags/$TAG)"
+          upstream_url="$(printf '%s' "$release_json" | jq -r '.html_url')"
+          body="$(printf '%s' "$release_json" | jq -r '.body // ""')"
+
+          {
+            echo "upstream_url=$upstream_url"
+            echo "body<<EOF"
+            echo "Mirrors upstream release [$TAG]($upstream_url)."
+            echo
+            echo "$body"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create mirrored release if missing
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body: ${{ steps.upstream.outputs.body }}
+          make_latest: true
+          fail_on_unmatched_files: false
