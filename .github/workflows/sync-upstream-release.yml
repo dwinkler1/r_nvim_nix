@@ -55,7 +55,7 @@ jobs:
 
       - name: Create update pull request
         if: steps.versions.outputs.update_needed == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore: update R.nvim to ${{ steps.versions.outputs.upstream_tag }}"
           branch: "automation/update-rnvim-${{ steps.versions.outputs.upstream_tag }}"
