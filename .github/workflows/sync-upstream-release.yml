@@ -45,13 +45,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          tag_regex='v[0-9]+\.[0-9]+\.[0-9]+[^"]*'
+          tag_regex='v[0-9]+\.[0-9]+\.[0-9]+[^" ]*'
           sed -i -E "s|(url = \"github:R-nvim/R.nvim/)${tag_regex}|\1${NEW_TAG}|g" flake.nix
           sed -i -E "s|(rnvimVersion = \")${tag_regex}(\";)|\1${NEW_TAG}\2|g" flake.nix
-
-          readme_tag_regex='v[0-9]+\.[0-9]+\.[0-9]+[^ ]*'
-          sed -i -E "s|(R.nvim\)\s+)${readme_tag_regex}|\1${NEW_TAG}|g" README.md
-          sed -i -E "s|(-nvimcom-)${readme_tag_regex}|\1${NEW_TAG}|g" README.md
+          sed -i -E "s|(R.nvim\)\s+)${tag_regex}|\1${NEW_TAG}|g" README.md
+          sed -i -E "s|(-nvimcom-)${tag_regex}|\1${NEW_TAG}|g" README.md
 
           nix flake lock --update-input rnvimsrc
 
