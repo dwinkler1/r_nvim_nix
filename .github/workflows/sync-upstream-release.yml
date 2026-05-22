@@ -27,12 +27,7 @@ jobs:
           set -euo pipefail
 
           upstream_tag="$(gh api repos/R-nvim/R.nvim/releases/latest --jq '.tag_name')"
-          current_tag="$(sed -n 's/.*url = "github:R-nvim\/R.nvim\/\(v[0-9]\+\.[0-9]\+\.[0-9]\+[^"]*\)".*/\1/p' flake.nix | head -n 1)"
-
-          if [ -z "$current_tag" ]; then
-            echo "Failed to detect current tag from flake.nix" >&2
-            exit 1
-          fi
+          current_tag="$(./scripts/get-rnvim-tag.sh flake.nix)"
 
           echo "upstream_tag=$upstream_tag" >> "$GITHUB_OUTPUT"
           echo "current_tag=$current_tag" >> "$GITHUB_OUTPUT"
@@ -50,10 +45,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          sed -i -E "s|(url = \"github:R-nvim/R.nvim/)v[0-9]+\.[0-9]+\.[0-9]+[^\"]*|\1${NEW_TAG}|g" flake.nix
-          sed -i -E "s|(rnvimVersion = \")v[0-9]+\.[0-9]+\.[0-9]+[^\"]*(\";)|\1${NEW_TAG}\2|g" flake.nix
-          sed -i -E "s|(R.nvim\)\s+)v[0-9]+\.[0-9]+\.[0-9]+[^ ]*|\1${NEW_TAG}|g" README.md
-          sed -i -E "s|(-nvimcom-)v[0-9]+\.[0-9]+\.[0-9]+[^ ]*|\1${NEW_TAG}|g" README.md
+          tag_regex='v[0-9]+\.[0-9]+\.[0-9]+[^"]*'
+          sed -i -E "s|(url = \"github:R-nvim/R.nvim/)${tag_regex}|\1${NEW_TAG}|g" flake.nix
+          sed -i -E "s|(rnvimVersion = \")${tag_regex}(\";)|\1${NEW_TAG}\2|g" flake.nix
+
+          readme_tag_regex='v[0-9]+\.[0-9]+\.[0-9]+[^ ]*'
+          sed -i -E "s|(R.nvim\)\s+)${readme_tag_regex}|\1${NEW_TAG}|g" README.md
+          sed -i -E "s|(-nvimcom-)${readme_tag_regex}|\1${NEW_TAG}|g" README.md
 
           nix flake lock --update-input rnvimsrc
 

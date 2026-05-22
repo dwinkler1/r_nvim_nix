@@ -23,11 +23,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          tag="$(sed -n 's/.*url = "github:R-nvim\/R.nvim\/\(v[0-9]\+\.[0-9]\+\.[0-9]\+[^"]*\)".*/\1/p' flake.nix | head -n 1)"
-          if [ -z "$tag" ]; then
-            echo "Failed to detect release tag from flake.nix" >&2
-            exit 1
-          fi
+          tag="$(./scripts/get-rnvim-tag.sh flake.nix)"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Fetch upstream release metadata
