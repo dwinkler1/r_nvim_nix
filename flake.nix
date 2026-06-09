@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     rnvimsrc = {
-      url = "github:R-nvim/R.nvim/v0.99.4";
+      url = "github:R-nvim/R.nvim/v0.99.5";
       flake = false;
     };
   };
@@ -24,7 +24,7 @@
     forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
     packages = forAllSystems (system: let
-      rnvimVersion = "v0.99.4";
+      rnvimVersion = "v0.99.5";
 
       pkgs = import nixpkgs {inherit system;};
     in rec {
