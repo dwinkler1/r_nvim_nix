@@ -1,6 +1,6 @@
 # R.nvim Overlay
 
-Nix flake overlay for [R.nvim](https://github.com/R-nvim/R.nvim) v0.99.5 — a Neovim plugin for R development.
+Nix flake overlay for [R.nvim](https://github.com/R-nvim/R.nvim) v1.0.0 — a Neovim plugin for R development.
 
 ## Packages
 
@@ -83,7 +83,7 @@ install it into your R environment:
 buildInputs = [ pkgs.rnvimserver pkgs.nvimcom ];
 
 # Or install manually into a user or project library:
-# R CMD INSTALL /nix/store/...-nvimcom-v0.99.5
+# R CMD INSTALL /nix/store/...-nvimcom-v1.0.0
 ```
 
 Alternatively, add `nvimcom` to your `R_LIBS_SITE` or `R_LIBS_USER` so R can
