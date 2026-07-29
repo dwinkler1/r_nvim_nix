@@ -55,6 +55,8 @@ jobs:
 
       - name: Create update pull request
         if: steps.versions.outputs.update_needed == 'true'
+        id: create_pr
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore: update R.nvim to ${{ steps.versions.outputs.upstream_tag }}"
@@ -68,3 +70,8 @@ jobs:
             - `flake.nix` version references
             - `flake.lock` update for `rnvimsrc`
             - `README.md` version references
+
+      - name: Warn when PR creation is blocked by repository policy
+        if: steps.versions.outputs.update_needed == 'true' && steps.create_pr.outcome == 'failure'
+        run: |
+          echo "::warning::Unable to create pull request with GITHUB_TOKEN. Enable 'Allow GitHub Actions to create and approve pull requests' in repository settings, or provide a token with PR-creation scope to this workflow."
